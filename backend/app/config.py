@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     # Infracost (optional - cost scanning)
     infracost_api_key: str | None = None
 
+    # GitHub (optional - for private repo cloning)
+    github_token: str | None = None
+
     model_config = {"env_prefix": "SCAN_", "extra": "ignore"}
 
 
@@ -47,6 +50,12 @@ def get_infracost_api_key() -> str | None:
     """Infracost API key from settings or INFRACOST_API_KEY env."""
     s = get_settings()
     return s.infracost_api_key or os.environ.get("INFRACOST_API_KEY")
+
+
+def get_github_token() -> str | None:
+    """GitHub token for private repo cloning (GITHUB_TOKEN or SCAN_GITHUB_TOKEN)."""
+    s = get_settings()
+    return s.github_token or os.environ.get("GITHUB_TOKEN") or os.environ.get("SCAN_GITHUB_TOKEN")
 
 
 def get_trivy_path() -> str | None:

@@ -11,6 +11,7 @@ const POLL_INTERVAL_MS = 1500
 export default function App() {
   const [targetType, setTargetType] = useState<TargetType>('code')
   const [dockerImageRef, setDockerImageRef] = useState('')
+  const [githubUrl, setGithubUrl] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [scanId, setScanId] = useState<string | null>(null)
   const [scanResult, setScanResult] = useState<ScanResult | null>(null)
@@ -45,11 +46,16 @@ export default function App() {
   const handleStartScan = useCallback(async () => {
     setError(null)
     const isImageScan = targetType === 'docker_image'
+    const isGithubScan = targetType === 'github_repo'
     if (isImageScan && !dockerImageRef.trim()) {
-      setError('Enter a Docker image reference (e.g. nginx:latest)')
+      setError('Enter a Docker image reference (e.g. nginx:latest or ghcr.io/owner/img:tag)')
       return
     }
-    if (!isImageScan && !file) {
+    if (isGithubScan && !githubUrl.trim()) {
+      setError('Enter a GitHub repo URL (e.g. https://github.com/user/repo or user/repo)')
+      return
+    }
+    if (!isImageScan && !isGithubScan && !file) {
       setError('Upload a file to scan')
       return
     }
@@ -59,6 +65,8 @@ export default function App() {
       formData.set('target_type', targetType)
       if (isImageScan) {
         formData.set('docker_image_ref', dockerImageRef.trim())
+      } else if (isGithubScan) {
+        formData.set('github_url', githubUrl.trim())
       } else if (file) {
         formData.append('file', file)
       }
@@ -68,12 +76,13 @@ export default function App() {
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to start scan')
     }
-  }, [targetType, dockerImageRef, file])
+  }, [targetType, dockerImageRef, githubUrl, file])
 
   const handleNewScan = useCallback(() => {
     setScanId(null)
     setScanResult(null)
     setFile(null)
+    setGithubUrl('')
     setError(null)
   }, [])
 
@@ -109,11 +118,13 @@ export default function App() {
                 onTargetTypeChange={setTargetType}
                 dockerImageRef={dockerImageRef}
                 onDockerImageRefChange={setDockerImageRef}
+                githubUrl={githubUrl}
+                onGithubUrlChange={setGithubUrl}
                 hasFile={!!file}
               />
             </div>
 
-            {targetType !== 'docker_image' && (
+            {targetType !== 'docker_image' && targetType !== 'github_repo' && (
               <div className="rounded-xl bg-slate-900/50 border border-slate-700 p-6">
                 <h2 className="text-lg font-semibold text-slate-200 mb-4">Upload</h2>
                 <FileUpload
@@ -138,8 +149,9 @@ export default function App() {
               type="button"
               onClick={handleStartScan}
               disabled={
-                (targetType === 'docker_image' ? !dockerImageRef.trim() : !file) ||
-                scanResult?.status === 'running'
+                scanResult?.status === 'running' ||
+                (targetType === 'docker_image' ? !dockerImageRef.trim() :
+                  targetType === 'github_repo' ? !githubUrl.trim() : !file)
               }
               className="px-6 py-3 rounded-lg bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >

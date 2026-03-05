@@ -5,6 +5,7 @@ export type TargetType =
   | 'kubernetes'
   | 'terraform'
   | 'ansible'
+  | 'github_repo'
 
 export type Severity = 'critical' | 'high' | 'medium' | 'low' | 'info'
 export type FindingCategory = 'security' | 'cost' | 'performance'

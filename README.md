@@ -115,10 +115,16 @@ The `render.yaml` Blueprint uses a single Docker service that builds both fronte
 | `/api/scans` | POST | Create and run a scan (multipart: file, target_type, docker_image_ref) |
 | `/api/scans/{id}` | GET | Get scan status and results |
 
+## Integrations
+
+- **GitHub** – Scan any public repo by URL (`https://github.com/user/repo` or `user/repo`). Set `GITHUB_TOKEN` for private repos.
+- **Docker registries** – Scan images from Docker Hub, GitHub Container Registry (ghcr.io), and other registries. Use full ref (e.g. `ghcr.io/owner/img:tag`).
+
 ## Environment Variables
 
 | Variable | Description |
 |----------|-------------|
+| `GITHUB_TOKEN` | GitHub token for private repo cloning (optional) |
 | `INFRACOST_API_KEY` | Infracost API key for Terraform cost scans |
 | `SCAN_UPLOAD_DIR` | Upload directory (default: `/tmp/security-scan-uploads`) |
 | `SCAN_MAX_UPLOAD_SIZE_MB` | Max upload size in MB (default: 100) |

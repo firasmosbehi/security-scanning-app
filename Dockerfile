@@ -13,6 +13,10 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Git for GitHub repo cloning
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install backend deps
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

@@ -14,6 +14,7 @@ class TargetType:
     KUBERNETES = "kubernetes"
     TERRAFORM = "terraform"
     ANSIBLE = "ansible"
+    GITHUB_REPO = "github_repo"
 
 
 def run_scan(target_path: str | Path, target_type: str, docker_image_ref: str | None = None) -> list[Finding]:
@@ -30,6 +31,10 @@ def run_scan(target_path: str | Path, target_type: str, docker_image_ref: str | 
     if target_type == TargetType.DOCKER_IMAGE and docker_image_ref:
         findings.extend(trivy.run_trivy_image(docker_image_ref))
         return findings
+
+    # github_repo uses same scanners as code (Trivy fs + Checkov)
+    if target_type == TargetType.GITHUB_REPO:
+        target_type = TargetType.CODE
 
     if not path or not path.exists():
         return findings
