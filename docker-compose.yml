@@ -1,0 +1,25 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - SCAN_UPLOAD_DIR=/tmp/uploads
+    volumes:
+      - scan-uploads:/tmp/uploads
+    # Scanners (Trivy, Checkov, Infracost) must be installed in the image or mounted
+    # For full functionality, use a custom image with scanners pre-installed
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  scan-uploads:

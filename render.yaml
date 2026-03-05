@@ -1,0 +1,19 @@
+# Render Blueprint - Security Scanning App
+# Deploy: https://dashboard.render.com/blueprint/new?repo=<YOUR_REPO_URL>
+
+services:
+  - type: web
+    name: security-scan-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+
+    # Health check hits API (avoids serving index.html for health)
+    healthCheckPath: /api/health
+
+    envVars:
+      # Optional: Infracost API key for Terraform cost scanning
+      # Get one at https://dashboard.infracost.io
+      - key: INFRACOST_API_KEY
+        sync: false
